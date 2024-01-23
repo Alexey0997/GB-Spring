@@ -2,52 +2,29 @@ package com.example.demo.repositories;
 
 import com.example.demo.model.User;
 import com.example.demo.utils.UserMapper;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 /**
- * Репозиторий для запросов к БД сущности пользователей.
+ * UserRepository - класс, реализующий запросы к базе данных пользоватей.
  */
 @Repository
+@AllArgsConstructor
 public class UserRepository {
-    /**
-     * Объект подключения к БД.
-     */
-    private final JdbcTemplate jdbc;
+    private final JdbcTemplate jdbc;     // Объект подключения к базе данных.
+    private final SqlQuery query;        // Объект инкапсуляции SQL-запросов.
 
     /**
-     * Конструктор класса.
+     * findUserById - метод получения данных о пользователи по id.
      *
-     * @param jdbc
-     */
-    public UserRepository(JdbcTemplate jdbc) {
-        this.jdbc = jdbc;
-    }
-
-    /**
-     * Метод поиска пользователя по его уникальному идентификатору.
-     * * findUserById - метод поиска пользователя по его уникальному идентификатору: выполняет запрос к базе данных,
-     * отображает результаты этого запроса в объекты класса User и возвращает первый найденный объект User
-     * с заданным идентификатором или null, если такого объекта не существует.
-     *
-     * @param id - уникальный идентификатор.
-     * @return - первый найденный объект.
+     * @param id - уникальный идентификатор пользователя.
+     * @return - объект пользователя или null в случае его отсутствия в БД.
      */
     public User findUserById(Integer id) {
-        String sql = "SELECT * FROM userTable WHERE id=?";
-        RowMapper<User> userRowMapper = (r, i) -> {
-            User rowObject = new User();
-            rowObject.setId(r.getInt("id"));
-            rowObject.setFirstName(r.getString("firstName"));
-            rowObject.setLastName(r.getString("lastName"));
-            return rowObject;
-        };
-
-        return jdbc.query(sql, new Object[]{id}, new UserMapper())
+        return jdbc.query(query.getFindUserById(), new Object[]{id}, new UserMapper())
                 .stream().findFirst().orElse(null);
     }
 
@@ -57,40 +34,35 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findAll() {
-        String sql = "SELECT * FROM userTable";
-        return jdbc.query(sql, new UserMapper());
+        return jdbc.query(query.getFindAllUsers(), new UserMapper());
     }
 
     /**
-     * Сохранение пользователя в БД.
+     * save - метод сохранения данных о пользователе в БД.
      *
      * @param user объект пользователя.
      * @return объект пользователя с id.
      */
     public User save(User user) {
-        String sql = "INSERT INTO userTable VALUES (NULL, ?, ?)";
-        jdbc.update(sql, user.getFirstName(), user.getLastName());
+        jdbc.update(query.getSaveUser(), user.getFirstName(), user.getLastName());
         return user;
     }
 
     /**
-     * Удаление пользователя из БД
-     * по уникальному идентификатору.
+     * deleteById - метод удаления данных о пользователе из БД по его id.
      *
      * @param id идентификатор пользователя.
      */
     public void deleteById(int id) {
-        String sql = "DELETE FROM userTable WHERE id=?";
-        jdbc.update(sql, id);
+        jdbc.update(query.getDeleteUser(), id);
     }
 
     /**
-     * Обновление пользователя в БД.
+     * update - метод обновления данных пользователя в БД.
      *
-     * @param user объект пользователя с измененными данными.
+     * @param user - объект пользователя с измененными данными.
      */
     public void update(User user) {
-        String sql = "UPDATE userTable SET firstName = ?, lastName = ? WHERE id = ?";
-        jdbc.update(sql, user.getFirstName(), user.getLastName(), user.getId());
+        jdbc.update(query.getUpdateUser(), user.getFirstName(), user.getLastName(), user.getId());
     }
 }

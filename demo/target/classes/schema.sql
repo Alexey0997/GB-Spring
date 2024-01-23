@@ -3,4 +3,3 @@ CREATE TABLE IF NOT EXISTS userTable (
     firstName varchar(50) NOT NULL,
     lastName varchar(50) NOT NULL
 );
-
