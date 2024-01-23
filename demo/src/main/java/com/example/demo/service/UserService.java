@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.model.User;
 import com.example.demo.repositories.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,54 +12,54 @@ import java.util.List;
  * Сервисный класс для работы с пользователями.
  */
 @Service
+@AllArgsConstructor
 public class UserService {
-    /**
-     * Объект репозитория для работы с БД.
-     */
-    private final UserRepository userRepository;
+    private final UserRepository userRepository; // Объект репозитория для работы с БД.
 
     /**
-     * Конструктор класса.
-     * @param userRepository репозиторий пользователей.
+     * getUserById - метод получения данных о пользователе по его id.
+     *
+     * @param id - уникальный идентификатор.
+     * @return - данные о пользователе.
      */
-    @Autowired
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public User getUserById(Integer id){
+    public User getUserById(Integer id) {
         return userRepository.findUserById(id);
     }
+
     /**
-     * Получение списка всех пользователей.
-     * @return список пользователей.
+     * findAll - метод получения списка всех пользователей, имеющихся в БД.
+     *
+     * @return - список пользователей.
      */
-    public List<User> findAll(){
+    public List<User> findAll() {
         return userRepository.findAll();
     }
 
     /**
-     * Создание нового пользователя.
+     * saveUser - метод создания нового пользователя.
+     *
      * @param user объект пользователя.
      * @return объект пользователя с присвоенным id.
      */
-    public User saveUser(User user){
+    public User saveUser(User user) {
         return userRepository.save(user);
     }
 
     /**
-     * Удаление пользователя.
-     * @param id уникальный идентификатор пользователя.
+     * deleteById - метод удаления пользователя по его id.
+     *
+     * @param id - уникальный идентификатор пользователя.
      */
-    public void deleteById(int id){
+    public void deleteById(int id) {
         userRepository.deleteById(id);
     }
 
     /**
-     * Изменение данных пользователя.
-     * @param user объект пользователя с новыми данными.
+     * updateUser - метод изменения данных о пользователе.
+     *
+     * @param user - объект пользователя с новыми данными.
      */
-    public void updateUser(User user){
+    public void updateUser(User user) {
         userRepository.update(user);
     }
 }
